@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - uploads_data:/app/app/statics_files/uploads
+      - pdfs_data:/app/app/statics_files/pdfs
+    environment:
+      - DATABASE_URL=mysql+pymysql://user:password@db_service/file_converter_db
+      - REDIS_URL=redis://redis_service:6379/0
+    depends_on:
+      - db_service
+      - redis_service
+    command: >
+      sh -c "./wait-for-it.sh db_service:3306 -- alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A app.celery_worker.celery_app worker --loglevel=info -Q file_task
+    environment:
+      - DATABASE_URL=mysql+pymysql://user:password@db_service:3306/file_converter_db
+      - REDIS_URL=redis://redis_service:6379/0
+    volumes:
+      - uploads_data:/app/app/statics_files/uploads
+      - pdfs_data:/app/app/statics_files/pdfs
+    depends_on:
+      - app
+      - db_service
+      - redis_service
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
+  db_service:
+    image: mysql:8
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: file_converter_db
+    volumes:
+      - db_data:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      retries: 5
+
+  redis_service:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  db_data:
+  redis_data:
+  uploads_data:
+  pdfs_data:

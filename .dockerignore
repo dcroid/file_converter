@@ -1,0 +1,11 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.log
+*.png
+*.jpeg
+*.jpg
+*.pdf
+*.eps
+*.bmp

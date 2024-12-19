@@ -1,0 +1,36 @@
+### Проверка запуска сервиса
+GET http://localhost:8000/
+User-Agent: MyBrowser/1.0
+###
+
+### Создание новой сессии
+POST http://localhost:8000/sessions/
+User-Agent: MyBrowser/1.0
+###
+
+### Загрузка файла
+POST http://localhost:8000/upload/?session_id=842a13b7-9165-4f13-9803-68bcae3bd269
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="example.eps"
+
+< /Users/andreyteterevkov/PyCharmProjects/file_converter/pythonProject/tools/example.eps
+--WebAppBoundary--
+
+###
+
+### Получение списка всех файлов
+GET http://localhost:8000/files/?session_id=842a13b7-9165-4f13-9803-68bcae3bd269
+Accept: application/json
+###
+
+### Получение метрик Prometheus
+GET http://localhost:8000/metrics
+Accept: text/plain
+###
+
+### Получение  PDF файла
+GET http://localhost:8000/files/original/7?session_id=e0ef6e0d-85b9-469f-9181-9acd0054a1b4
+Accept: application/pdf
+###
