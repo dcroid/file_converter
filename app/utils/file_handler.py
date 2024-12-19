@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.models import File, Session as SessionModel
 import os
-from app.enams import FileTypeInSystemEnum
+from app.enums import FileTypeInSystemEnum
 
 
 def download_file(file_id: int, session_id: str, file_type: FileTypeInSystemEnum, db: Session) -> FileResponse:

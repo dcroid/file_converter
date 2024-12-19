@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import relationship
 
-from app.enams import FileStatusEnum
+from app.enums import FileStatusEnum
 
 from typing import Optional
 

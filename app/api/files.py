@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.config import MAX_FILE_SIZE_MB, UPLOAD_DIR, PDF_DIR
 from app.context import session_id_context
 from app.database import get_db
-from app.enams import FileStatusEnum, FileTypeInSystemEnum
+from app.enums import FileStatusEnum, FileTypeInSystemEnum
 from app.models import File, Session as SessionModel
 from app.schemas import FileResponse as ApiFileResponse
 from app.utils.file_handler import download_file

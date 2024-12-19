@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel, Field, model_validator
 
 from app.context import session_id_context
-from app.enams import FileStatusEnum
+from app.enums import FileStatusEnum
 from app.config import BASE_URL
 
 

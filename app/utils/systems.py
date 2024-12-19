@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 
 from app.config import DATABASE_URL, REDIS_URL, UPLOAD_DIR, PDF_DIR, BASE_DIR
-from app.enams import FileExtensionEnum
+from app.enums import FileExtensionEnum
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)

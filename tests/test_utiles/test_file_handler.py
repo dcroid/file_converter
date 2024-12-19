@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.models import File, Session as SessionModel
-from app.enams import FileTypeInSystemEnum
+from app.enums import FileTypeInSystemEnum
 from app.utils.file_handler import download_file
 
 
