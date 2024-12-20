@@ -17,6 +17,13 @@ class FileTypeInSystemEnum(enum.Enum):
     ORIGINAL = "original"
     CONVERTED = "converted"
 
+class HTTPStatusCodeEnum(enum.Enum):
+    FORBIDDEN = 403
+    NOT_FOUND = 404
+    INTERNAL_SERVER_ERROR = 500
+    BAD_REQUEST = 400
+    UNAUTHORIZED = 401
+
 class LogMessageEnum(enum.Enum):
     SUCCESSFUL_CHECK = "✅ Successfully connected to {}"
     FAILED_CHECK = "❌ Failed to connect to {}: {}"
