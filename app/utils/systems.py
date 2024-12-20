@@ -12,7 +12,15 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-def check_mysql_connection():
+redis_client = None
+
+def get_redis_client() -> redis.Redis:
+    global redis_client
+    if redis_client is None:
+        redis_client = redis.from_url(REDIS_URL)
+    return redis_client
+
+def check_mysql_connection() -> bool:
     """Проверяет подключение к MySQL."""
     try:
         engine = create_engine(DATABASE_URL)
@@ -25,10 +33,10 @@ def check_mysql_connection():
         return False
 
 
-def check_redis_connection():
+def check_redis_connection() -> bool:
     """Проверяет подключение к Redis."""
     try:
-        r = redis.from_url(REDIS_URL)
+        r = get_redis_client()
         r.ping()
         logger.info(LogMessageEnum.SUCCESSFUL_CHECK.value.format("Redis"))
         return True
