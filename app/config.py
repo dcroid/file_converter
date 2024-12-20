@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+SERVICE_NAME = "File Conversion Service"
+SERVICE_VERSION = "1.0.0"
+
 # Дериктории для файлов
 BASE_DIR = os.getenv("BASE_DIR", os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = f'{BASE_DIR}/statics_files'
