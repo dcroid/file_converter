@@ -17,8 +17,16 @@ class FileTypeInSystemEnum(enum.Enum):
     ORIGINAL = "original"
     CONVERTED = "converted"
 
-class CheckMessageEnam(enum.Enum):
-    SUCCESSFUL_CHECK = f"✅ Successfully connected to "
-    FAILED_CHECK = f"❌ Failed to connect to "
-    SUCCESSFUL_CONVERT = f"✅ Successfully converted image to PDF"
-    FAILED_CONVERT = f"❌ Error converting file to PDF"
+class LogMessageEnum(enum.Enum):
+    SUCCESSFUL_CHECK = "✅ Successfully connected to {}"
+    FAILED_CHECK = "❌ Failed to connect to {}: {}"
+    SUCCESSFUL_CONVERT = "✅ Successfully converted {} to PDF: {}"
+    FAILED_CONVERT = "❌ Error converting file to PDF {}"
+    NOT_FOUND = "⚠️ File not found"
+    ACCESS_DENIED = "⛔ Access denied to {}"
+    FILE_INVALID_TYPE = "🚫 Invalid file type"
+    UNSUPPORTED_FORMAT = "📛 Unsupported file format for conversion"
+    DIRECTORIES_ENSURED = "✅ 📂 Directories ensured: '{}' and '{}'"
+    FILE_NOT_EXIST = "❓ File '{}' does not exist"
+    FILE_TOO_LARGE = "📏❌ File too large (max {} MB)"
+    INVALID_SESSION = "🔑❌ Invalid session ID"

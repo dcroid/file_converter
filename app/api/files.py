@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.config import MAX_FILE_SIZE_MB, UPLOAD_DIR, PDF_DIR
 from app.context import session_id_context
 from app.database import get_db
-from app.enums import FileStatusEnum, FileTypeInSystemEnum
+from app.enums import FileStatusEnum, FileTypeInSystemEnum, LogMessageEnum
 from app.models import File, Session as SessionModel
 from app.schemas import FileResponse as ApiFileResponse
 from app.utils.file_handler import download_file
@@ -23,7 +23,7 @@ async def upload_file(file: UploadFile, db: Session = Depends(get_db)):
     session_id = session_id_context.get()
     session = db.query(SessionModel).filter(SessionModel.session_id == session_id).first()
     if not session:
-        raise HTTPException(status_code=400, detail="Invalid session ID")
+        raise HTTPException(status_code=400, detail=LogMessageEnum.INVALID_SESSION.value)
 
     session.last_login = datetime.utcnow()
     db.commit()
@@ -32,13 +32,16 @@ async def upload_file(file: UploadFile, db: Session = Depends(get_db)):
     contents = await file.read()
     file_size = len(contents)
     if file_size > MAX_FILE_SIZE_MB * 1024 * 1024:
-        raise HTTPException(status_code=413, detail="File too large (max 100 MB)")
+        raise HTTPException(
+            status_code=413,
+            detail=LogMessageEnum.FILE_TOO_LARGE.value.format(MAX_FILE_SIZE_MB)
+        )
 
     file_name, file_extension = os.path.splitext(file.filename)
 
     # Проверка расширения файла
     if not validate_file_extension(file_extension):
-        raise HTTPException(status_code=400, detail="Invalid file type")
+        raise HTTPException(status_code=400, detail=LogMessageEnum.FILE_INVALID_TYPE.value)
 
     file_name = f"{str(uuid.uuid4())}_{file_name}"
     full_file_name = f"{file_name}{file_extension}"
@@ -70,7 +73,12 @@ def get_files(request: Request = None, db: Session = Depends(get_db)):
     """
     session_id = session_id_context.get()
     if not session_id:
-        raise HTTPException(status_code=403, detail="Access denied. Session ID is required.")
+        raise HTTPException(
+            status_code=403,
+            detail=LogMessageEnum.ACCESS_DENIED.value.format(
+                f"route. {LogMessageEnum.INVALID_SESSION.value}"
+            )
+        )
     try:
         SessionModel.get_by_session_id(db, session_id)
     except ValueError as e:

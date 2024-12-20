@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.models import File, Session as SessionModel
 import os
-from app.enums import FileTypeInSystemEnum
+from app.enums import FileTypeInSystemEnum, LogMessageEnum
 
 
 def download_file(file_id: int, session_id: str, file_type: FileTypeInSystemEnum, db: Session) -> FileResponse:
@@ -20,7 +20,10 @@ def download_file(file_id: int, session_id: str, file_type: FileTypeInSystemEnum
 
     file = File.get_by_id(db, file_id)
     if not file or file.session_id != session.session_id:
-        raise HTTPException(status_code=403, detail="Access denied to this file.")
+        raise HTTPException(
+            status_code=403,
+            detail=LogMessageEnum.ACCESS_DENIED.value.format("file")
+        )
 
     if file_type == FileTypeInSystemEnum.ORIGINAL:
         file_path = file.filepath
@@ -29,10 +32,10 @@ def download_file(file_id: int, session_id: str, file_type: FileTypeInSystemEnum
         file_path = file.pdf_path
         filename = os.path.basename(file.pdf_path) if file.pdf_path else None
     else:
-        raise ValueError("Invalid file type specified.")
+        raise ValueError(LogMessageEnum.FILE_INVALID_TYPE.value)
 
     if not file_path or not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail=f"File not found.")
+        raise HTTPException(status_code=404, detail=LogMessageEnum.NOT_FOUND.value)
 
     return FileResponse(
         path=file_path,

@@ -6,7 +6,7 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: file_converter
+      MYSQL_DATABASE: file_converter_db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     ports:

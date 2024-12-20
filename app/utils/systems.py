@@ -7,7 +7,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 
 from app.config import DATABASE_URL, REDIS_URL, UPLOAD_DIR, PDF_DIR, BASE_DIR
-from app.enums import FileExtensionEnum
+from app.enums import FileExtensionEnum, LogMessageEnum
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
@@ -18,10 +18,10 @@ def check_mysql_connection():
         engine = create_engine(DATABASE_URL)
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
-        logger.info("✅ Successfully connected to MySQL")
+        logger.info(LogMessageEnum.SUCCESSFUL_CHECK.value.format("MySQL"))
         return True
     except OperationalError as e:
-        logger.error(f"❌ Failed to connect to MySQL: {e}")
+        logger.error(LogMessageEnum.FAILED_CHECK.value.format("MySQL", e))
         return False
 
 
@@ -30,10 +30,10 @@ def check_redis_connection():
     try:
         r = redis.from_url(REDIS_URL)
         r.ping()
-        logger.info("✅ Successfully connected to Redis")
+        logger.info(LogMessageEnum.SUCCESSFUL_CHECK.value.format("Redis"))
         return True
     except redis.ConnectionError as e:
-        logger.error(f"❌ Failed to connect to Redis: {e}")
+        logger.error(LogMessageEnum.FAILED_CHECK.value.format("Redis", e))
         return False
 
 
@@ -49,17 +49,20 @@ def convert_to_pdf(input_path: str, output_path: str):
     file_path = get_absolute_path(input_path)
     output_path = get_absolute_path(output_path)
     if not os.path.exists(file_path):
-        msg = f"Input file '{file_path}' does not exist."
-        logger.error(msg)
-        raise FileNotFoundError(msg)
+        logger.error(LogMessageEnum.FILE_NOT_EXIST.value.format(file_path))
+        raise FileNotFoundError(LogMessageEnum.FILE_NOT_EXIST.value.format(file_path))
 
     try:
         # Конвертация изображений (png, bmp, jpg, jpeg)
-        files_extensive = tuple((ext.value for ext in FileExtensionEnum if ext.value != "eps"))
+        files_extensive = tuple(
+            (
+                ext.value for ext in FileExtensionEnum if ext.value != FileExtensionEnum.EPS.value
+            )
+        )
         if input_path.lower().endswith(files_extensive):
             image = Image.open(file_path)
             image.convert("RGB").save(output_path, "PDF")
-            logger.info(f"✅ Successfully converted image to PDF: {output_path}")
+            logger.info(LogMessageEnum.SUCCESSFUL_CONVERT.value.format("image", output_path))
 
         # Конвертация EPS в PDF
         elif input_path.lower().endswith(FileExtensionEnum.EPS.value):
@@ -68,15 +71,13 @@ def convert_to_pdf(input_path: str, output_path: str):
             c = canvas.Canvas(output_path)
             c.drawImage(file_path, 0, 0)
             c.save()
-            logger.info(f"✅ Successfully converted EPS to PDF: {output_path}")
+            logger.info(LogMessageEnum.SUCCESSFUL_CONVERT.value.format(FileExtensionEnum.EPS.value, output_path))
         else:
-            msg = "Unsupported file format for conversion."
-            logger.error(msg)
-            raise ValueError(msg)
+            logger.error(LogMessageEnum.UNSUPPORTED_FORMAT.value)
+            raise ValueError(LogMessageEnum.UNSUPPORTED_FORMAT.value)
     except Exception as e:
-        msg = f"Error converting file to PDF: {e}"
-        logger.error(msg)
-        raise RuntimeError(msg)
+        logger.error(LogMessageEnum.FAILED_CONVERT.value.format(e))
+        raise RuntimeError(LogMessageEnum.FAILED_CONVERT.value.format(e))
 
 
 def create_directories():
@@ -85,7 +86,7 @@ def create_directories():
     """
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     os.makedirs(PDF_DIR, exist_ok=True)
-    logger.info(f"✅ Directories ensured: '{UPLOAD_DIR}' and '{PDF_DIR}'")
+    logger.info(LogMessageEnum.DIRECTORIES_ENSURED.value.format(UPLOAD_DIR, PDF_DIR))
 
 
 def get_absolute_path(relative_path: str) -> str:
