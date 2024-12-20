@@ -42,7 +42,7 @@ class FileResponse(BaseModel):
         if session_id:
             self.pdf_url = (
                 f"{BASE_URL}/files/pdf/{self.id}?session_id={session_id}"
-                if self.status == FileStatusEnum.processed and self.pdf_url is None
+                if self.status == FileStatusEnum.PROCESSED and self.pdf_url is None
                 else None
             )
             self.original_url = f"{BASE_URL}/files/original/{self.id}?session_id={session_id}"

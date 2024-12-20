@@ -9,7 +9,7 @@ User-Agent: MyBrowser/1.0
 ###
 
 ### Загрузка файла
-POST http://localhost:8000/upload/?session_id=9b8e9bb6-1f80-4937-b139-8cba68ddd219
+POST http://localhost:8000/upload/?session_id=8b192765-8c39-4a04-8523-eb56702cc2e8
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary

@@ -37,7 +37,7 @@ def upgrade() -> None:
     sa.Column('filepath', sa.String(length=255), nullable=False),
     sa.Column('size', sa.Integer(), nullable=True),
     sa.Column('extension', sa.String(length=10), nullable=True),
-    sa.Column('status', sa.Enum('uploaded', 'processing', 'processed', 'error', name='filestatusenum'), nullable=True),
+    sa.Column('status', sa.Enum('UPLOADED', 'PROCESSING', 'PROCESSED', 'ERROR', name='filestatusenum'), nullable=True),
     sa.Column('pdf_path', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['session_id'], ['sessions.session_id'], ),
     sa.PrimaryKeyConstraint('id')

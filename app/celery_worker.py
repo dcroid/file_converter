@@ -32,13 +32,13 @@ def convert_to_pdf_task(file_id: int, file_path: str, output_path: str):
         logger.info("Начало выполнения задачи для файла ID: %d", file_id)
         convert_to_pdf(file_path, output_path)
 
-        file.status = FileStatusEnum.processed
+        file.status = FileStatusEnum.PROCESSING
         file.pdf_path = output_path
         logger.info("Задача завершена успешно для файла ID: %d", file_id)
     except Exception as e:
         logger.error("Ошибка при выполнении задачи для файла ID %d: %s", file_id, e)
         if file:
-            file.status = FileStatusEnum.error
+            file.status = FileStatusEnum.ERROR
     finally:
         db.commit()
         db.close()

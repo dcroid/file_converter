@@ -55,7 +55,7 @@ async def upload_file(file: UploadFile, db: Session = Depends(get_db)):
         filepath=filepath,
         size=file_size,
         extension=file_extension,
-        status=FileStatusEnum.uploaded,
+        status=FileStatusEnum.UPLOADED,
     ).save(db)
 
     pdf_path = f"{PDF_DIR}/{file_name}.pdf"

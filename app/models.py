@@ -65,7 +65,7 @@ class File(BaseModel):
     filepath = Column(String(255), nullable=False)
     size = Column(Integer)
     extension = Column(String(10))
-    status = Column(Enum(FileStatusEnum), default=FileStatusEnum.uploaded)
+    status = Column(Enum(FileStatusEnum), default=FileStatusEnum.UPLOADED)
     pdf_path = Column(String(255), nullable=True)
     session = relationship("Session", back_populates="files")
 
